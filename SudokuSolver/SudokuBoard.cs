@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SudokuSolver
+{
+    public class SudokuBoard
+    {
+        public SudokuBoard()
+        {
+            Numbers= new int?[9,9];
+            for (int i = 0; i < 9; i++)
+            {
+                for (int j = 0; j < 9; j++)
+                {
+                    Numbers[i, j] = 10*i + j;
+                }
+            }
+        }
+        public int?[,] Numbers { get; set; }
+
+    }
+}

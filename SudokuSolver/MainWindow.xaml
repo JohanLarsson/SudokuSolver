@@ -1,0 +1,29 @@
+﻿<Window x:Class="SudokuSolver.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sudokuSolver="clr-namespace:SudokuSolver"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="350" Width="525" 
+        d:DataContext="{d:DesignInstance sudokuSolver:SudokuBoard, IsDesignTimeCreatable=True}">
+    <Window.Resources>
+        <DataTemplate x:Key="SudokuCellTemplate" DataType="{x:Type sudokuSolver:SudokuCell}">
+            <TextBox Text="{Binding Number}" Height="40" Width="40"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="Matrix">
+            <ItemsControl ItemsSource="{Binding}" ItemTemplate="{DynamicResource SudokuCellTemplate}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </DataTemplate>
+
+    </Window.Resources>
+    <Grid>
+        <ItemsControl ItemsSource="{Binding Numbers}"></ItemsControl>
+    </Grid>
+</Window>
