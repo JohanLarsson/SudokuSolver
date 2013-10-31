@@ -15,7 +15,7 @@ namespace SudokuSolver
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    Numbers[i, j] = new SudokuCell();
+                    Numbers[i, j] = new SudokuCell(this, i, j);
                 }
             }
         }
