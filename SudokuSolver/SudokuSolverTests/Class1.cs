@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.AccessControl;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using System.Runtime.Serialization;
 
 namespace SudokuSolverTests
 {
+    [Serializable]
     public class Class1
     {
         public int[,] Ints { get; set; }
@@ -20,15 +22,9 @@ namespace SudokuSolverTests
         public void IndexOfTest()
         {
             Ints = new int[2, 2] { { 1, 2 }, { 3, 4 } };
-            var serializer = new DataContractSerializer(this.GetType());
-            using (var writer = new StringWriter())
-            {
-                using (var xmlWriter = XmlWriter.Create(writer))
-                {
-                    serializer.WriteObject(xmlWriter, this);
-                }
-                Console.Write(writer);
-            }
+            var bf = new BinaryFormatter();
+            MemoryStream ms = new MemoryStream();
+            bf.Serialize(ms, this);
 
         }
 

@@ -24,7 +24,9 @@ namespace SudokuSolver
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new SudokuBoard();
+            DataContext = new Vm();
         }
+
+
     }
 }

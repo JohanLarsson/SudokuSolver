@@ -1,11 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Input;
+using Ookii.Dialogs.Wpf;
 
 namespace SudokuSolver
 {
+    [Serializable]
     public class SudokuBoard
     {
         public SudokuBoard()
@@ -19,6 +24,8 @@ namespace SudokuSolver
                 }
             }
         }
+
+
         public SudokuCell[,] Numbers { get; set; }
 
     }

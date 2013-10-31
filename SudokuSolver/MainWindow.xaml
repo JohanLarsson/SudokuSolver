@@ -6,7 +6,7 @@
         xmlns:sudokuSolver="clr-namespace:SudokuSolver"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" 
-        d:DataContext="{d:DesignInstance sudokuSolver:SudokuBoard, IsDesignTimeCreatable=True}" SizeToContent="WidthAndHeight">
+        d:DataContext="{d:DesignInstance sudokuSolver:Vm, IsDesignTimeCreatable=True}" SizeToContent="WidthAndHeight">
     <Window.Resources>
         <sudokuSolver:FlattenConverter x:Key="FlattenConverter"/>
         <sudokuSolver:ToRowsConverter x:Key="ToRowsConverter"/>
@@ -39,16 +39,25 @@
             </TextBox>
         </DataTemplate>
     </Window.Resources>
-    <Grid>
-        <ItemsControl ItemsSource="{Binding Numbers, Converter={StaticResource FlattenConverter}}" 
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_New" Command="{Binding NewCommand}"/>
+                <MenuItem Header="_Open" Command="{Binding OpenCommand}"/>
+                <Separator />
+                <MenuItem Header="_Save" Command="{Binding SaveCommand}"/>
+                <MenuItem Header="Save _As" Command="{Binding SaveAsCommand}"/>
+            </MenuItem>
+        </Menu>
+        <ItemsControl ItemsSource="{Binding Board.Numbers, Converter={StaticResource FlattenConverter}}" 
                       ItemTemplate="{StaticResource SudokuCellTemplate}" 
                       Height="Auto" Width="Auto" >
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <UniformGrid Rows="{Binding Numbers, Converter={StaticResource ToRowsConverter}}" 
-                                 Columns="{Binding Numbers, Converter={StaticResource ToColumnsConverter}}"/>
+                    <UniformGrid Rows="{Binding Board.Numbers, Converter={StaticResource ToRowsConverter}}" 
+                                 Columns="{Binding Board.Numbers, Converter={StaticResource ToColumnsConverter}}"/>
                 </ItemsPanelTemplate>
             </ItemsControl.ItemsPanel>
         </ItemsControl>
-    </Grid>
+    </DockPanel>
 </Window>

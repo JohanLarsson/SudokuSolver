@@ -1,3 +1,4 @@
+using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -5,9 +6,10 @@ using SudokuSolver.Annotations;
 
 namespace SudokuSolver
 {
+    [Serializable]
     public class SudokuCell : INotifyPropertyChanged
     {
-        private readonly SudokuBoard _board;
+        private SudokuBoard _board;
 
         public SudokuCell(SudokuBoard board, int row, int col)
         {
@@ -16,9 +18,22 @@ namespace SudokuSolver
             ColumnIndex = col;
         }
 
-        public int RowIndex { get; private set; }
-        public int ColumnIndex { get; private set; }
+
+        public int RowIndex
+        {
+            get { return _rowIndex; }
+            private set { _rowIndex = value; }
+        }
+
+        public int ColumnIndex
+        {
+            get { return _columnIndex; }
+            private set { _columnIndex = value; }
+        }
+
+        [NonSerialized]
         private SudokuCell[] _row;
+
         public SudokuCell[] Row
         {
             get
@@ -34,7 +49,7 @@ namespace SudokuSolver
                 return _row;
             }
         }
-
+        [NonSerialized]
         private SudokuCell[] _column;
         public SudokuCell[] Column
         {
@@ -45,7 +60,7 @@ namespace SudokuSolver
                     _column = new SudokuCell[_board.Numbers.GetLength(0)];
                     for (int row = _board.Numbers.GetLowerBound(0); row < _board.Numbers.GetLength(0); row++)
                     {
-                        _column[row] = _board.Numbers[ row,ColumnIndex];
+                        _column[row] = _board.Numbers[row, ColumnIndex];
                     }
                 }
                 return _column;
@@ -53,6 +68,8 @@ namespace SudokuSolver
         }
 
         private int? _number;
+        private int _rowIndex;
+        private int _columnIndex;
 
 
         public int? Number
@@ -71,6 +88,7 @@ namespace SudokuSolver
             return string.Format("RowIndex: {0}, ColumnIndex: {1}, Number: {2}", RowIndex, ColumnIndex, Number);
         }
 
+        [field: NonSerialized]
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
