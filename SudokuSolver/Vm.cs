@@ -22,6 +22,22 @@ namespace SudokuSolver
             SaveAsCommand = new RelayCommand(o=> SaveAs());
             OpenCommand = new RelayCommand(o => Open());
             NewCommand = new RelayCommand(o => New());
+            NextCommand = new RelayCommand(o=>Next());
+        }
+
+        private void Next()
+        {
+            for (int i = 0; i < Board.Numbers.GetLength(0); i++)
+            {
+                for (int j = 0; j < Board.Numbers.GetLength(1); j++)
+                {
+                    var cell = Board.Numbers[i,j];
+                    if (cell.Number == null && cell.PossibleValues.Count == 1)
+                    {
+                        cell.Number = cell.PossibleValues.Single();
+                    }
+                }
+            }
         }
 
         private void New()
@@ -91,6 +107,8 @@ namespace SudokuSolver
         }
 
         public ICommand NewCommand { get; private set; }
+
+        public ICommand NextCommand { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -1,7 +1,10 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Windows.Documents;
 using SudokuSolver.Annotations;
 
 namespace SudokuSolver
@@ -64,6 +67,18 @@ namespace SudokuSolver
                     }
                 }
                 return _column;
+            }
+        }
+
+        public List<int> PossibleValues
+        {
+            get
+            {
+                var range = Enumerable.Range(1, 9);
+                return
+                    range
+                        .Except(Row.Where(x => x.Number.HasValue).Select(x => x.Number.Value)
+                        .Concat(Column.Where(x => x.Number.HasValue).Select(x => x.Number.Value))).ToList();
             }
         }
 
