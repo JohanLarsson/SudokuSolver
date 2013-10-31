@@ -10,16 +10,16 @@ namespace SudokuSolver
     {
         public SudokuBoard()
         {
-            Numbers= new int?[9,9];
+            Numbers = new SudokuCell[9, 9];
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    Numbers[i, j] = 10*i + j;
+                    Numbers[i, j] = new SudokuCell { Number = 10 * i + j };
                 }
             }
         }
-        public int?[,] Numbers { get; set; }
+        public SudokuCell[,] Numbers { get; set; }
 
     }
 }
