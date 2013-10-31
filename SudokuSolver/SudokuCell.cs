@@ -6,7 +6,19 @@ namespace SudokuSolver
 {
     public class SudokuCell : INotifyPropertyChanged
     {
-        public int? Number { get; set; }
+        private int? _number;
+
+        public int? Number
+        {
+            get { return _number; }
+            set
+            {
+                if (value == _number) return;
+                _number = value;
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
