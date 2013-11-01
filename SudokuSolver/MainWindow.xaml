@@ -6,7 +6,7 @@
         xmlns:sudokuSolver="clr-namespace:SudokuSolver"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525" 
-        d:DataContext="{d:DesignInstance sudokuSolver:Vm, IsDesignTimeCreatable=True}" SizeToContent="WidthAndHeight">
+        d:DataContext="{d:DesignInstance sudokuSolver:Vm, IsDesignTimeCreatable=True}" SizeToContent="WidthAndHeight" ResizeMode="NoResize">
     <Window.Resources>
         <sudokuSolver:FlattenConverter x:Key="FlattenConverter"/>
         <sudokuSolver:ToRowsConverter x:Key="ToRowsConverter"/>
@@ -20,14 +20,16 @@
             </DataGrid>
         </ControlTemplate>
         <DataTemplate x:Key="SudokuCellTemplate" DataType="{x:Type sudokuSolver:SudokuCell}">
-            <Grid>
-                <TextBlock Text="{Binding GuessedValue}" Foreground="Red" Height="30" Width="30" Padding="8" TextAlignment="Center"/>
-                <TextBox Text="{Binding Number, Converter={StaticResource NullableIntConverter}}" Height="30" Width="30" Padding="6" Background="Transparent">
-                    <TextBox.ToolTip>
-                        <StackPanel Orientation="Horizontal">
-                            <!--<ItemsControl ItemsSource="{Binding Row}" Template="{StaticResource ArrayTemplate}"/>
+            <Border BorderThickness="1" BorderBrush="{Binding HasError}" Background="{Binding Background}">
+                <Grid>
+                    <TextBlock Text="{Binding GuessedValue}" Foreground="Red" VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent"/>
+                    <TextBox Text="{Binding Number, Converter={StaticResource NullableIntConverter}}" 
+                             VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextAlignment="Center" Background="Transparent" BorderThickness="0" FontSize="45" MaxLines="3">
+                        <TextBox.ToolTip>
+                            <StackPanel Orientation="Horizontal">
+                                <!--<ItemsControl ItemsSource="{Binding Row}" Template="{StaticResource ArrayTemplate}"/>
                         <ItemsControl ItemsSource="{Binding Column}" Template="{StaticResource ArrayTemplate}"/>-->
-                            <!--<DataGrid ItemsSource="{Binding Row}" AutoGenerateColumns="False" IsReadOnly="True">
+                                <!--<DataGrid ItemsSource="{Binding Row}" AutoGenerateColumns="False" IsReadOnly="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Row" Binding="{Binding Number}"/>
                                 </DataGrid.Columns>
@@ -37,20 +39,22 @@
                                     <DataGridTextColumn Header="Column" Binding="{Binding Number}"/>
                                 </DataGrid.Columns>
                             </DataGrid>-->
-                            <DataGrid ItemsSource="{Binding Cluster}" AutoGenerateColumns="False" IsReadOnly="True">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Cluster" Binding="{Binding Number}"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                            <DataGrid ItemsSource="{Binding PossibleValues}" AutoGenerateColumns="False" IsReadOnly="True">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Possible" Binding="{Binding}"/>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </StackPanel>
-                    </TextBox.ToolTip>
-                </TextBox>
-            </Grid>
+                                <DataGrid ItemsSource="{Binding Cluster}" AutoGenerateColumns="False" IsReadOnly="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Cluster" Binding="{Binding Number}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <DataGrid ItemsSource="{Binding PossibleValues}" AutoGenerateColumns="False" IsReadOnly="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Possible" Binding="{Binding}"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                            </StackPanel>
+                        </TextBox.ToolTip>
+                    </TextBox>
+                </Grid>
+            </Border>
+
 
         </DataTemplate>
     </Window.Resources>
@@ -67,7 +71,7 @@
         </Menu>
         <ItemsControl ItemsSource="{Binding Board.Cells, Converter={StaticResource FlattenConverter}}" 
                       ItemTemplate="{StaticResource SudokuCellTemplate}" 
-                      Height="Auto" Width="Auto" >
+                      Height="600" Width="600" >
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Rows="{Binding Board.Cells, Converter={StaticResource ToRowsConverter}}" 

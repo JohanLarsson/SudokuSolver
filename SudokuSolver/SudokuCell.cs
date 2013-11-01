@@ -5,6 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows.Documents;
+using System.Windows.Media;
 using SudokuSolver.Annotations;
 
 namespace SudokuSolver
@@ -77,13 +78,13 @@ namespace SudokuSolver
             {
                 if (_cluster == null)
                 {
-                    _cluster= new SudokuCell[9];
-                                    var zeroRow = GetMacroZero(RowIndex);
-                var zeroCol = GetMacroZero(ColumnIndex);
+                    _cluster = new SudokuCell[9];
+                    var zeroRow = GetMacroZero(RowIndex);
+                    var zeroCol = GetMacroZero(ColumnIndex);
                     int index = 0;
-                    for (int i = zeroRow; i < zeroRow+3; i++)
+                    for (int i = zeroRow; i < zeroRow + 3; i++)
                     {
-                        for (int j = zeroCol; j < zeroCol+3; j++)
+                        for (int j = zeroCol; j < zeroCol + 3; j++)
                         {
                             _cluster[index] = _board.Cells[i, j];
                             index++;
@@ -155,7 +156,46 @@ namespace SudokuSolver
             {
                 if (value == _guessedValue) return;
                 _guessedValue = value;
+                foreach (var cell in Row)
+                {
+                    cell.OnPropertyChanged("HasError");
+                }
+                foreach (var cell in Column)
+                {
+                    cell.OnPropertyChanged("HasError");
+                }
+                foreach (var cell in Cluster)
+                {
+                    cell.OnPropertyChanged("HasError");
+                }
                 OnPropertyChanged();
+            }
+        }
+
+        public SolidColorBrush HasError
+        {
+            get
+            {
+                if (HasValue)
+                    return Brushes.Black;
+                return PossibleValues.Any()
+                    ? Brushes.Black
+                    : Brushes.Red;
+            }
+        }
+
+        public SolidColorBrush Background
+        {
+            get
+            {
+                int rc = GetMacroZero(RowIndex);
+                int cc = GetMacroZero(ColumnIndex);
+                bool br = rc % 2 == 0;
+                bool bc = cc % 2 == 0;
+                bool b = br ^ bc;
+                return b
+                    ? Brushes.LightGray
+                    : Brushes.White;
             }
         }
 
