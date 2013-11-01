@@ -75,7 +75,7 @@ namespace SudokuSolver
         {
             if (SolverResults.Any(x => x == SolverResult.Guessed))
             {
-                cell.GuessValue = value;
+                cell.CalculatedAfterGuess = value;
             }
             else
             {
@@ -157,7 +157,7 @@ namespace SudokuSolver
         {
             get
             {
-                return LastResult == SolverResult.Done;
+                return LastResult == SolverResult.Done || LastResult == SolverResult.Error;
             }
         }
 
@@ -173,30 +173,25 @@ namespace SudokuSolver
                 _innerResults.Add(SolverResult.FoundOne);
                 return;
             }
-            var remainingCells = new List<SudokuCell>();
-            foreach (var cell in Board.Cells)
+
+            if (Board.AllCells.Any(c => !c.HasValue && !c.PossibleValues.Any()))
             {
-                if (cell.HasValue)
-                    continue;
-                if (!cell.PossibleValues.Any())
-                {
-                    _innerResults.Add(SolverResult.Error);
-                    return;
-                }
-                remainingCells.Add(cell);
+                _innerResults.Add(SolverResult.Error);
+                return;
             }
+            var remainingCells = Board.AllCells.Where(c => !c.HasValue).ToArray();
             if (!remainingCells.Any())
             {
                 _innerResults.Add(SolverResult.Done);
                 return;
             }
             int min = remainingCells.Min(x => x.PossibleValues.Count);
-            SudokuCell sudokuCell = remainingCells.First(x => x.PossibleValues.Count == min);
-            for (int index = 0; index < sudokuCell.PossibleValues.Count; index++)
+            SudokuCell guessCell = remainingCells.First(x => x.PossibleValues.Count == min);
+            for (int index = 0; index < guessCell.PossibleValues.Count; index++)
             {
                 SudokuBoard sudokuBoard = Board.Clone();
-                sudokuBoard.Cells[sudokuCell.RowIndex, sudokuCell.RowIndex].GuessValue =
-                    sudokuCell.PossibleValues[index];
+                sudokuBoard.Cells[guessCell.RowIndex, guessCell.ColumnIndex].GuessValue =
+                    guessCell.PossibleValues[index];
                 var solver = new Solver(this, sudokuBoard);
                 _guessSolvers.Add(solver);
                 _solverCount++;

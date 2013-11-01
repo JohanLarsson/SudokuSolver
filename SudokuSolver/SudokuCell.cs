@@ -124,7 +124,7 @@ namespace SudokuSolver
                 r = 6;
             return r;
         }
-        public bool HasValue { get { return Number.HasValue || CalculatedValue.HasValue || GuessValue.HasValue; } }
+        public bool HasValue { get { return Number.HasValue || CalculatedValue.HasValue || GuessValue.HasValue || CalculatedAfterGuess.HasValue; } }
 
         public int Value
         {
@@ -136,7 +136,8 @@ namespace SudokuSolver
                     return CalculatedValue.Value;
                 if (GuessValue.HasValue)
                     return GuessValue.Value;
-
+                if (CalculatedAfterGuess.HasValue)
+                    return CalculatedAfterGuess.Value;
                 throw new InvalidOperationException();
             }
         }
@@ -148,6 +149,8 @@ namespace SudokuSolver
         private int? _calculatedValue;
         [NonSerialized]
         private int? _guessValue;
+
+        private int? _calculatedAfterGuess;
 
         public int? CalculatedValue
         {
@@ -168,6 +171,39 @@ namespace SudokuSolver
                 {
                     cell.OnPropertyChanged("HasError");
                 }
+                OnPropertyChanged();
+            }
+        }
+
+        public int? GuessValue
+        {
+            get { return _guessValue; }
+            set
+            {
+                if (value == _guessValue) return;
+                _guessValue = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int? Number
+        {
+            get { return _number; }
+            set
+            {
+                if (value == _number) return;
+                _number = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int? CalculatedAfterGuess
+        {
+            get { return _calculatedAfterGuess; }
+            set
+            {
+                if (value == _calculatedAfterGuess) return;
+                _calculatedAfterGuess = value;
                 OnPropertyChanged();
             }
         }
@@ -198,29 +234,6 @@ namespace SudokuSolver
                     : Brushes.White;
             }
         }
-
-        public int? GuessValue
-        {
-            get { return _guessValue; }
-            set
-            {
-                if (value == _guessValue) return;
-                _guessValue = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public int? Number
-        {
-            get { return _number; }
-            set
-            {
-                if (value == _number) return;
-                _number = value;
-                OnPropertyChanged();
-            }
-        }
-
         public override string ToString()
         {
             return string.Format("RowIndex: {0}, ColumnIndex: {1}, Number: {2}", RowIndex, ColumnIndex, Number);

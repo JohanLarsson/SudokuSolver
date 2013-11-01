@@ -23,6 +23,7 @@
             <Border BorderThickness="1" BorderBrush="{Binding HasError}" Background="{Binding Background}">
                 <Grid>
                     <TextBlock Text="{Binding GuessValue}" Foreground="Blue" VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent" FontSize="22"/>
+                    <TextBlock Text="{Binding CalculatedAfterGuess}" Foreground="Purple" VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent" FontSize="22"/>
                     <TextBlock Text="{Binding CalculatedValue}" Foreground="Red" VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent" FontSize="22"/>
                     <TextBox Text="{Binding Number, Converter={StaticResource NullableIntConverter}}" 
                              VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextAlignment="Center" Background="Transparent" BorderThickness="0" FontSize="22" MaxLines="3">

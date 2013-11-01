@@ -25,7 +25,6 @@ namespace SudokuSolver
             }
         }
 
-
         public SudokuCell[,] Cells { get; set; }
 
         public IEnumerable<SudokuCell> AllCells
@@ -42,14 +41,15 @@ namespace SudokuSolver
         public SudokuBoard Clone()
         {
             var board = new SudokuBoard();
-            foreach (var sudokuCell in Cells)
+            foreach (var cell in AllCells)
             {
-                board.Cells[sudokuCell.RowIndex, sudokuCell.ColumnIndex] = new SudokuCell(board, sudokuCell.RowIndex,
-                    sudokuCell.ColumnIndex)
+                board.Cells[cell.RowIndex, cell.ColumnIndex] = new SudokuCell(board, cell.RowIndex,
+                    cell.ColumnIndex)
                 {
-                    Number = sudokuCell.Number,
-                    CalculatedValue = sudokuCell.CalculatedValue,
-                    GuessValue = sudokuCell.GuessValue
+                    Number = cell.Number,
+                    CalculatedValue = cell.CalculatedValue,
+                    GuessValue = cell.GuessValue,
+                    CalculatedAfterGuess = cell.CalculatedAfterGuess
                 };
             }
             return board;
