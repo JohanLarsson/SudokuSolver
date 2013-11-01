@@ -28,6 +28,17 @@ namespace SudokuSolver
 
         public SudokuCell[,] Cells { get; set; }
 
+        public IEnumerable<SudokuCell> AllCells
+        {
+            get
+            {
+                foreach (var sudokuCell in Cells)
+                {
+                    yield return sudokuCell;
+                }
+            }
+        }
+
         public SudokuBoard Clone()
         {
             var board = new SudokuBoard();

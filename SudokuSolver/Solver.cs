@@ -25,72 +25,62 @@ namespace SudokuSolver
         public SudokuBoard Board { get; private set; }
         public bool FindSimple()
         {
-            bool foundOne = false;
-            foreach (var cell in Board.Cells)
+            bool foundSimple = false;
+            var cells = Board.AllCells.Where(c => c.PossibleValues.Count == 1).ToArray();
+            foreach (var cell in cells)
             {
-                if (cell.PossibleValues.Count == 1)
-                {
-                    if (SolverResults.Any(x => x == SolverResult.Guessed))
-                    {
-                        cell.GuessValue = cell.PossibleValues.Single();
-                    }
-                    else
-                    {
-                        cell.CalculatedValue = cell.PossibleValues.Single();
-                    }
-                    foundOne = true;
-                }
+                AddValue(cell, cell.PossibleValues.Single());
+                foundSimple = true;
             }
-            return foundOne;
+            return foundSimple;
         }
 
         public bool FindIntersect()
         {
             bool foundOne = false;
-            foreach (var cell in Board.Cells)
+            var cells = Board.AllCells.Where(c => !c.HasValue).ToArray();
+            foreach (var cell in cells)
             {
-                if (!cell.HasValue)
+                var allRowValues = cell.Row.SelectMany(x => x.PossibleValues).ToArray();
+                var allColumnValues = cell.Column.SelectMany(x => x.PossibleValues).ToArray();
+                var allClusterValues = cell.Cluster.SelectMany(x => x.PossibleValues).ToArray();
+                foreach (var possibleValue in cell.PossibleValues)
                 {
-                    var allRowValues = cell.Row.SelectMany(x => x.PossibleValues);
-                    var allColumnValues = cell.Column.SelectMany(x => x.PossibleValues);
-                    var allClusterValues = cell.Cluster.SelectMany(x => x.PossibleValues);
-                    foreach (var possibleValue in cell.PossibleValues)
+                    if (AddIfIntersect(cell, allRowValues, possibleValue))
                     {
-                        if (AddIfIntersect(cell, allRowValues, possibleValue))
-                        {
-                            foundOne = true;
-                        }
-                        if (AddIfIntersect(cell, allColumnValues, possibleValue))
-                        {
-                            foundOne = true;
-                        }
-                        if (AddIfIntersect(cell, allClusterValues, possibleValue))
-                        {
-                            foundOne = true;
-                        }
+                        foundOne = true;
                     }
-
+                    if (AddIfIntersect(cell, allColumnValues, possibleValue))
+                    {
+                        foundOne = true;
+                    }
+                    if (AddIfIntersect(cell, allClusterValues, possibleValue))
+                    {
+                        foundOne = true;
+                    }
                 }
             }
             return foundOne;
         }
 
-        private bool AddIfIntersect(SudokuCell cell, IEnumerable<int> cells, int possibleValue)
+        private bool AddIfIntersect(SudokuCell cell, IEnumerable<int> possibleValues, int possibleValue)
         {
-            if (cells.Count(x => x == possibleValue) == 1)
-            {
-                if (SolverResults.Any(x => x == SolverResult.Guessed))
-                {
-                    cell.GuessValue = possibleValue;
-                }
-                else
-                {
-                    cell.CalculatedValue = possibleValue;
-                }
+            if (possibleValues.Count(x => x == possibleValue) != 1)
+                return false;
+            AddValue(cell, possibleValue);
+            return true;
+        }
 
-                return true;
+        private void AddValue(SudokuCell cell, int value)
+        {
+            if (SolverResults.Any(x => x == SolverResult.Guessed))
+            {
+                cell.GuessValue = value;
             }
-            return false;
+            else
+            {
+                cell.CalculatedValue = value;
+            }
         }
 
         public Solver Solve()
