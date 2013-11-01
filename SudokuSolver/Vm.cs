@@ -24,6 +24,8 @@ namespace SudokuSolver
             {
                 if (args.PropertyName =="Board")
                 {
+                    if(_notNewBoard)
+                        return;
                     _solver = new Solver(Board);
                 }
             };
@@ -32,13 +34,16 @@ namespace SudokuSolver
             SaveAsCommand = new RelayCommand(o=> SaveAs());
             OpenCommand = new RelayCommand(o => Open());
             NewCommand = new RelayCommand(o => New());
-            NextCommand = new RelayCommand(o=>Next());
+            NextCommand = new RelayCommand(o=>Next(),o=>!_solver.IsDone);
         }
 
+        private bool _notNewBoard;
         private void Next()
         {
-            Solver solver = _solver.Next();
-            Board = solver.Board;
+            _solver = _solver.Next();
+            _notNewBoard = true;
+            Board= _solver.Board;
+            _notNewBoard = false;
         }
 
         private List<Solver> _solvers= new List<Solver>(); 

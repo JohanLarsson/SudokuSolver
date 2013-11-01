@@ -30,7 +30,7 @@ namespace SudokuSolver
             {
                 if (cell.PossibleValues.Count == 1)
                 {
-                    if (_results.Any(x => x == SolverResult.Guessed))
+                    if (SolverResults.Any(x => x == SolverResult.Guessed))
                     {
                         cell.GuessValue = cell.PossibleValues.Single();
                     }
@@ -51,9 +51,9 @@ namespace SudokuSolver
             {
                 if (!cell.HasValue)
                 {
-                    var allRowValues = cell.Row.SelectMany(x => x.PossibleValues).ToArray();
-                    var allColumnValues = cell.Column.SelectMany(x => x.PossibleValues).ToArray();
-                    var allClusterValues = cell.Cluster.SelectMany(x => x.PossibleValues).ToArray();
+                    var allRowValues = cell.Row.SelectMany(x => x.PossibleValues);
+                    var allColumnValues = cell.Column.SelectMany(x => x.PossibleValues);
+                    var allClusterValues = cell.Cluster.SelectMany(x => x.PossibleValues);
                     foreach (var possibleValue in cell.PossibleValues)
                     {
                         if (AddIfIntersect(cell, allRowValues, possibleValue))
@@ -79,7 +79,7 @@ namespace SudokuSolver
         {
             if (cells.Count(x => x == possibleValue) == 1)
             {
-                if (_results.Any(x => x == SolverResult.Guessed))
+                if (SolverResults.Any(x => x == SolverResult.Guessed))
                 {
                     cell.GuessValue = possibleValue;
                 }
@@ -102,64 +102,72 @@ namespace SudokuSolver
             }
         }
 
+        private SolverResult LastResult
+        {
+            get
+            {
+                return SolverResults.Any()
+                    ? SolverResults.Last()
+                    : SolverResult.Unknown;
+            }
+        }
+
         public Solver Next()
         {
-            if (!_results.Any())
+            if (LastResult == SolverResult.Unknown || LastResult == SolverResult.FoundOne || !_innerResults.Any())
             {
                 SolveStep();
-                return this;
-            }
-            SolverResult last = _results.Last();
-            if (last == SolverResult.FoundOne)
-            {
-                SolveStep();
+                if (LastResult == SolverResult.Guessed)
+                {
+                    var guessSolver = _guessSolvers[_guessIndex];
+                    _guessIndex++;
+                    return guessSolver;
+                }
                 return this;
             }
 
-            if (last == SolverResult.Done)
+            if (LastResult == SolverResult.Done)
             {
                 return this;
             }
-            if (last == SolverResult.Error)
+            if (LastResult == SolverResult.Error)
             {
-                return this;
+                return _antecedent;
             }
-            if (last == SolverResult.Guessed)
+            if (LastResult == SolverResult.Guessed)
             {
-                foreach (var tempSolver in _tempSolvers)
-                {
-                    switch (tempSolver._results.LastOrDefault())
-                    {
-                        case SolverResult.Done:
-                            return tempSolver;
-                        case SolverResult.Error:
-                            continue;
-                        case SolverResult.FoundOne:
-                            return tempSolver.Next();
-                        case SolverResult.Guessed:
-                            tempSolver.SolveStep();
-                            return tempSolver;
-                        case SolverResult.Unknown:
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
-                    }
-                }
+
+                if (_guessIndex >= _guessSolvers.Count)
+                    return _antecedent;
+                var guessSolver = _guessSolvers[_guessIndex];
+                _guessIndex++;
+                guessSolver.SolveStep();
+                return guessSolver;
             }
             throw new Exception(string.Format(@"message"));
 
         }
 
+        private int _guessIndex = 0;
+
         private static int _solverCount;
 
         private readonly List<SolverResult> _innerResults = new List<SolverResult>();
-        private  List<SolverResult> _results
+        public List<SolverResult> SolverResults
         {
             get
             {
                 if (_antecedent != null)
-                    return _antecedent._results.Concat(_innerResults).ToList();
+                    return _antecedent.SolverResults.Concat(_innerResults).ToList();
                 return _innerResults;
+            }
+        }
+
+        public bool IsDone
+        {
+            get
+            {
+                return LastResult == SolverResult.Done;
             }
         }
 
@@ -200,14 +208,14 @@ namespace SudokuSolver
                 sudokuBoard.Cells[sudokuCell.RowIndex, sudokuCell.RowIndex].GuessValue =
                     sudokuCell.PossibleValues[index];
                 var solver = new Solver(this, sudokuBoard);
-                _tempSolvers.Add(solver);
+                _guessSolvers.Add(solver);
                 _solverCount++;
             }
             _innerResults.Add(SolverResult.Guessed);
             return;
         }
 
-        private readonly List<Solver> _tempSolvers = new List<Solver>();
+        private readonly List<Solver> _guessSolvers = new List<Solver>();
     }
 
     public enum SolverResult
