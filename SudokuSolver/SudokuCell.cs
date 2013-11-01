@@ -43,10 +43,10 @@ namespace SudokuSolver
             {
                 if (_row == null)
                 {
-                    _row = new SudokuCell[_board.Numbers.GetLength(0)];
-                    for (int col = _board.Numbers.GetLowerBound(1); col < _board.Numbers.GetLength(1); col++)
+                    _row = new SudokuCell[_board.Cells.GetLength(0)];
+                    for (int col = _board.Cells.GetLowerBound(1); col < _board.Cells.GetLength(1); col++)
                     {
-                        _row[col] = _board.Numbers[RowIndex, col];
+                        _row[col] = _board.Cells[RowIndex, col];
                     }
                 }
                 return _row;
@@ -60,10 +60,10 @@ namespace SudokuSolver
             {
                 if (_column == null)
                 {
-                    _column = new SudokuCell[_board.Numbers.GetLength(0)];
-                    for (int row = _board.Numbers.GetLowerBound(0); row < _board.Numbers.GetLength(0); row++)
+                    _column = new SudokuCell[_board.Cells.GetLength(0)];
+                    for (int row = _board.Cells.GetLowerBound(0); row < _board.Cells.GetLength(0); row++)
                     {
-                        _column[row] = _board.Numbers[row, ColumnIndex];
+                        _column[row] = _board.Cells[row, ColumnIndex];
                     }
                 }
                 return _column;
@@ -74,18 +74,63 @@ namespace SudokuSolver
         {
             get
             {
+                if (HasValue)
+                    return new List<int>();
                 var range = Enumerable.Range(1, 9);
+                var rowValues = Row.Where(x => x.HasValue).Select(x => x.Value);
+                var colValues = Column.Where(x => x.HasValue).Select(x => x.Value);
                 return
                     range
-                        .Except(Row.Where(x => x.Number.HasValue).Select(x => x.Number.Value)
-                        .Concat(Column.Where(x => x.Number.HasValue).Select(x => x.Number.Value))).ToList();
+                        .Except(rowValues.Concat(colValues))
+                        .ToList();
+            }
+        }
+        public bool HasValue { get { return Number.HasValue || GuessedValue.HasValue || TempGuessValue.HasValue; } }
+
+        public int Value
+        {
+            get
+            {
+                if (Number.HasValue)
+                    return Number.Value;
+                if (GuessedValue.HasValue)
+                    return GuessedValue.Value;
+                if (TempGuessValue.HasValue)
+                    return TempGuessValue.Value;
+
+                throw new InvalidOperationException();
             }
         }
 
         private int? _number;
         private int _rowIndex;
         private int _columnIndex;
+        [NonSerialized]
+        private int? _guessedValue;
+        [NonSerialized]
+        private int? _tempGuessValue;
 
+        public int? GuessedValue
+        {
+            get { return _guessedValue; }
+            set
+            {
+                if (value == _guessedValue) return;
+                _guessedValue = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int? TempGuessValue
+        {
+            get { return _tempGuessValue; }
+            set
+            {
+                if (value == _tempGuessValue) return;
+                _tempGuessValue = value;
+                OnPropertyChanged();
+            }
+        }
 
         public int? Number
         {

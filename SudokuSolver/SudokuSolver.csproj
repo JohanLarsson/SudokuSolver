@@ -62,6 +62,7 @@
     <Compile Include="MatrixToDataViewConverter.cs" />
     <Compile Include="MatrixView.cs" />
     <Compile Include="Properties\Annotations.cs" />
+    <Compile Include="Solver.cs" />
     <Compile Include="SudokuBoard.cs" />
     <Compile Include="SudokuCell.cs" />
     <Compile Include="ToColumnsConverter.cs" />

@@ -15,18 +15,18 @@ namespace SudokuSolver
     {
         public SudokuBoard()
         {
-            Numbers = new SudokuCell[9, 9];
+            Cells = new SudokuCell[9, 9];
             for (int i = 0; i < 9; i++)
             {
                 for (int j = 0; j < 9; j++)
                 {
-                    Numbers[i, j] = new SudokuCell(this, i, j);
+                    Cells[i, j] = new SudokuCell(this, i, j);
                 }
             }
         }
 
 
-        public SudokuCell[,] Numbers { get; set; }
+        public SudokuCell[,] Cells { get; set; }
 
     }
 }

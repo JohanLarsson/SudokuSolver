@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,6 +19,14 @@ namespace SudokuSolver
         public Vm()
         {
             Board = new SudokuBoard();
+            this.PropertyChanged += (sender, args) =>
+            {
+                if (args.PropertyName =="Board")
+                {
+                    _solver = new Solver(Board);
+                }
+            };
+            _solver = new Solver(Board);
             SaveCommand = new RelayCommand(o => Save());
             SaveAsCommand = new RelayCommand(o=> SaveAs());
             OpenCommand = new RelayCommand(o => Open());
@@ -27,17 +36,11 @@ namespace SudokuSolver
 
         private void Next()
         {
-            for (int i = 0; i < Board.Numbers.GetLength(0); i++)
-            {
-                for (int j = 0; j < Board.Numbers.GetLength(1); j++)
-                {
-                    var cell = Board.Numbers[i,j];
-                    if (cell.Number == null && cell.PossibleValues.Count == 1)
-                    {
-                        cell.Number = cell.PossibleValues.Single();
-                    }
-                }
-            }
+            if(_solver.FindSimple())
+                return;
+            if(_solver.FindIntersect())
+                return;
+
         }
 
         private void New()
@@ -66,6 +69,7 @@ namespace SudokuSolver
         private string _fileName;
         private readonly string _filter = "Sudoku files|*.sud";
         private SudokuBoard _board;
+        private Solver _solver;
 
         public ICommand SaveCommand { get; private set; }
         public ICommand SaveAsCommand { get; private set; }
@@ -101,7 +105,8 @@ namespace SudokuSolver
                 var bf = new BinaryFormatter();
                 using (var fileStream = File.OpenRead(_fileName))
                 {
-                    Board = (SudokuBoard)bf.Deserialize(fileStream);
+                    var sudokuBoard = (SudokuBoard)bf.Deserialize(fileStream);
+                    Board = sudokuBoard;
                 }
             }
         }
