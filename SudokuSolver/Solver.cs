@@ -38,6 +38,7 @@ namespace SudokuSolver
                 {
                     var allRowValues = cell.Row.SelectMany(x => x.PossibleValues).ToArray();
                     var allColumnValues = cell.Column.SelectMany(x => x.PossibleValues).ToArray();
+                    var allClusterValues = cell.Cluster.SelectMany(x => x.PossibleValues).ToArray();
                     foreach (var possibleValue in cell.PossibleValues)
                     {
                         if (allColumnValues.Count(x => x == possibleValue) == 1)
@@ -46,6 +47,11 @@ namespace SudokuSolver
                             foundOne = true;
                         }
                         if (allRowValues.Count(x => x == possibleValue) == 1)
+                        {
+                            cell.GuessedValue = possibleValue;
+                            foundOne = true;
+                        }
+                        if (allClusterValues.Count(x => x == possibleValue) == 1)
                         {
                             cell.GuessedValue = possibleValue;
                             foundOne = true;

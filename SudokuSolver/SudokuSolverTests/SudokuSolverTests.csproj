@@ -48,6 +48,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Sudos\Easy.sud" />
+    <None Include="Sudos\Hard.sud" />
+    <None Include="Sudos\Medium.sud" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
