@@ -28,5 +28,20 @@ namespace SudokuSolver
 
         public SudokuCell[,] Cells { get; set; }
 
+        public SudokuBoard Clone()
+        {
+            var board = new SudokuBoard();
+            foreach (var sudokuCell in Cells)
+            {
+                board.Cells[sudokuCell.RowIndex, sudokuCell.ColumnIndex] = new SudokuCell(board, sudokuCell.RowIndex,
+                    sudokuCell.ColumnIndex)
+                {
+                    Number = sudokuCell.Number,
+                    GuessedValue = sudokuCell.GuessedValue,
+                    TempGuessValue = sudokuCell.TempGuessValue
+                };
+            }
+            return board;
+        }
     }
 }

@@ -69,6 +69,31 @@ namespace SudokuSolver
                 return _column;
             }
         }
+        [NonSerialized]
+        private SudokuCell[] _cluster;
+        public SudokuCell[] Cluster
+        {
+            get
+            {
+                if (_cluster == null)
+                {
+                    _cluster= new SudokuCell[9];
+                                    var zeroRow = GetMacroZero(RowIndex);
+                var zeroCol = GetMacroZero(ColumnIndex);
+                    int index = 0;
+                    for (int i = zeroRow; i < zeroRow+3; i++)
+                    {
+                        for (int j = zeroCol; j < zeroCol+3; j++)
+                        {
+                            _cluster[index] = _board.Cells[i, j];
+                            index++;
+                        }
+                    }
+                }
+
+                return _cluster;
+            }
+        }
 
         public List<int> PossibleValues
         {
@@ -79,11 +104,24 @@ namespace SudokuSolver
                 var range = Enumerable.Range(1, 9);
                 var rowValues = Row.Where(x => x.HasValue).Select(x => x.Value);
                 var colValues = Column.Where(x => x.HasValue).Select(x => x.Value);
+                var clusterValues = Cluster.Where(x => x.HasValue).Select(x => x.Value);
+
+
                 return
                     range
-                        .Except(rowValues.Concat(colValues))
+                        .Except(rowValues.Concat(colValues).Concat(clusterValues))
                         .ToList();
             }
+        }
+
+        private int GetMacroZero(int i)
+        {
+            int r = 3;
+            if (i < 3)
+                r = 0;
+            if (i > 5)
+                r = 6;
+            return r;
         }
         public bool HasValue { get { return Number.HasValue || GuessedValue.HasValue || TempGuessValue.HasValue; } }
 

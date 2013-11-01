@@ -21,7 +21,7 @@
         </ControlTemplate>
         <DataTemplate x:Key="SudokuCellTemplate" DataType="{x:Type sudokuSolver:SudokuCell}">
             <Grid>
-                <TextBlock Text="{Binding GuessedValue}" Foreground="Red" Height="30" Width="30" Padding="7"/>
+                <TextBlock Text="{Binding GuessedValue}" Foreground="Red" Height="30" Width="30" Padding="8" TextAlignment="Center"/>
                 <TextBox Text="{Binding Number, Converter={StaticResource NullableIntConverter}}" Height="30" Width="30" Padding="6" Background="Transparent">
                     <TextBox.ToolTip>
                         <StackPanel Orientation="Horizontal">
@@ -37,6 +37,11 @@
                                     <DataGridTextColumn Header="Column" Binding="{Binding Number}"/>
                                 </DataGrid.Columns>
                             </DataGrid>-->
+                            <DataGrid ItemsSource="{Binding Cluster}" AutoGenerateColumns="False" IsReadOnly="True">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Cluster" Binding="{Binding Number}"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
                             <DataGrid ItemsSource="{Binding PossibleValues}" AutoGenerateColumns="False" IsReadOnly="True">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Possible" Binding="{Binding}"/>
