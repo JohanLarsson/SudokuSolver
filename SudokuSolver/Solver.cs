@@ -26,9 +26,11 @@ namespace SudokuSolver
         public bool FindSimple()
         {
             bool foundSimple = false;
-            var cells = Board.AllCells.Where(c => c.PossibleValues.Count == 1).ToArray();
-            foreach (var cell in cells)
+            var simples = Board.AllCells.Where(c => c.PossibleValues.Count == 1).ToArray();
+            foreach (var cell in simples)
             {
+                if (!cell.PossibleValues.Any())
+                    return false;
                 AddValue(cell, cell.PossibleValues.Single());
                 foundSimple = true;
             }
@@ -157,7 +159,7 @@ namespace SudokuSolver
         {
             get
             {
-                return LastResult == SolverResult.Done || LastResult == SolverResult.Error;
+                return LastResult == SolverResult.Done;
             }
         }
 
