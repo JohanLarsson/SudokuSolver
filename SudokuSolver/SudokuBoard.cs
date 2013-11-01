@@ -37,8 +37,8 @@ namespace SudokuSolver
                     sudokuCell.ColumnIndex)
                 {
                     Number = sudokuCell.Number,
-                    GuessedValue = sudokuCell.GuessedValue,
-                    TempGuessValue = sudokuCell.TempGuessValue
+                    CalculatedValue = sudokuCell.CalculatedValue,
+                    GuessValue = sudokuCell.GuessValue
                 };
             }
             return board;

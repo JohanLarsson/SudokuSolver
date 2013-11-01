@@ -124,7 +124,7 @@ namespace SudokuSolver
                 r = 6;
             return r;
         }
-        public bool HasValue { get { return Number.HasValue || GuessedValue.HasValue || TempGuessValue.HasValue; } }
+        public bool HasValue { get { return Number.HasValue || CalculatedValue.HasValue || GuessValue.HasValue; } }
 
         public int Value
         {
@@ -132,10 +132,10 @@ namespace SudokuSolver
             {
                 if (Number.HasValue)
                     return Number.Value;
-                if (GuessedValue.HasValue)
-                    return GuessedValue.Value;
-                if (TempGuessValue.HasValue)
-                    return TempGuessValue.Value;
+                if (CalculatedValue.HasValue)
+                    return CalculatedValue.Value;
+                if (GuessValue.HasValue)
+                    return GuessValue.Value;
 
                 throw new InvalidOperationException();
             }
@@ -145,17 +145,17 @@ namespace SudokuSolver
         private int _rowIndex;
         private int _columnIndex;
         [NonSerialized]
-        private int? _guessedValue;
+        private int? _calculatedValue;
         [NonSerialized]
-        private int? _tempGuessValue;
+        private int? _guessValue;
 
-        public int? GuessedValue
+        public int? CalculatedValue
         {
-            get { return _guessedValue; }
+            get { return _calculatedValue; }
             set
             {
-                if (value == _guessedValue) return;
-                _guessedValue = value;
+                if (value == _calculatedValue) return;
+                _calculatedValue = value;
                 foreach (var cell in Row)
                 {
                     cell.OnPropertyChanged("HasError");
@@ -199,13 +199,13 @@ namespace SudokuSolver
             }
         }
 
-        public int? TempGuessValue
+        public int? GuessValue
         {
-            get { return _tempGuessValue; }
+            get { return _guessValue; }
             set
             {
-                if (value == _tempGuessValue) return;
-                _tempGuessValue = value;
+                if (value == _guessValue) return;
+                _guessValue = value;
                 OnPropertyChanged();
             }
         }

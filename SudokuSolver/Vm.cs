@@ -8,6 +8,7 @@ using System.Runtime.Remoting.Messaging;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using Ookii.Dialogs.Wpf;
 using SudokuSolver.Annotations;
@@ -36,12 +37,11 @@ namespace SudokuSolver
 
         private void Next()
         {
-            if(_solver.FindSimple())
-                return;
-            if(_solver.FindIntersect())
-                return;
-
+            Solver solver = _solver.Next();
+            Board = solver.Board;
         }
+
+        private List<Solver> _solvers= new List<Solver>(); 
 
         private void New()
         {

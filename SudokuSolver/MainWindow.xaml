@@ -22,9 +22,10 @@
         <DataTemplate x:Key="SudokuCellTemplate" DataType="{x:Type sudokuSolver:SudokuCell}">
             <Border BorderThickness="1" BorderBrush="{Binding HasError}" Background="{Binding Background}">
                 <Grid>
-                    <TextBlock Text="{Binding GuessedValue}" Foreground="Red" VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent"/>
+                    <TextBlock Text="{Binding GuessValue}" Foreground="Blue" VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent" FontSize="22"/>
+                    <TextBlock Text="{Binding CalculatedValue}" Foreground="Red" VerticalAlignment="Center" HorizontalAlignment="Center" Background="Transparent" FontSize="22"/>
                     <TextBox Text="{Binding Number, Converter={StaticResource NullableIntConverter}}" 
-                             VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextAlignment="Center" Background="Transparent" BorderThickness="0" FontSize="45" MaxLines="3">
+                             VerticalAlignment="Stretch" HorizontalAlignment="Stretch" TextAlignment="Center" Background="Transparent" BorderThickness="0" FontSize="22" MaxLines="3">
                         <TextBox.ToolTip>
                             <StackPanel Orientation="Horizontal">
                                 <!--<ItemsControl ItemsSource="{Binding Row}" Template="{StaticResource ArrayTemplate}"/>
@@ -39,11 +40,11 @@
                                     <DataGridTextColumn Header="Column" Binding="{Binding Number}"/>
                                 </DataGrid.Columns>
                             </DataGrid>-->
-                                <DataGrid ItemsSource="{Binding Cluster}" AutoGenerateColumns="False" IsReadOnly="True">
+                                <!--<DataGrid ItemsSource="{Binding Cluster}" AutoGenerateColumns="False" IsReadOnly="True">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Cluster" Binding="{Binding Number}"/>
                                     </DataGrid.Columns>
-                                </DataGrid>
+                                </DataGrid>-->
                                 <DataGrid ItemsSource="{Binding PossibleValues}" AutoGenerateColumns="False" IsReadOnly="True">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Possible" Binding="{Binding}"/>
@@ -71,7 +72,7 @@
         </Menu>
         <ItemsControl ItemsSource="{Binding Board.Cells, Converter={StaticResource FlattenConverter}}" 
                       ItemTemplate="{StaticResource SudokuCellTemplate}" 
-                      Height="600" Width="600" >
+                      Height="300" Width="300" >
             <ItemsControl.ItemsPanel>
                 <ItemsPanelTemplate>
                     <UniformGrid Rows="{Binding Board.Cells, Converter={StaticResource ToRowsConverter}}" 
