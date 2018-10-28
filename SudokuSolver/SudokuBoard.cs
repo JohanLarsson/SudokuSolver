@@ -2,10 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
 
     [Serializable]
-    public class SudokuBoard
+    public class SudokuBoard : INotifyPropertyChanged
     {
+        private SudokuCell[,] cells;
+
         public SudokuBoard()
         {
             this.Cells = new SudokuCell[9, 9];
@@ -18,7 +22,24 @@
             }
         }
 
-        public SudokuCell[,] Cells { get; set; }
+        [field:NonSerialized]
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public SudokuCell[,] Cells
+        {
+            get => this.cells;
+            set
+            {
+                if (ReferenceEquals(value, this.cells))
+                {
+                    return;
+                }
+
+                this.cells = value;
+                this.OnPropertyChanged();
+                this.OnPropertyChanged(nameof(this.AllCells));
+            }
+        }
 
         public IEnumerable<SudokuCell> AllCells
         {
@@ -46,6 +67,11 @@
             }
 
             return board;
+        }
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

@@ -26,6 +26,25 @@
 
         public SudokuBoard Board { get; }
 
+        public List<SolverResult> SolverResults
+        {
+            get
+            {
+                if (this.antecedent != null)
+                {
+                    return this.antecedent.SolverResults.Concat(this.innerResults).ToList();
+                }
+
+                return this.innerResults;
+            }
+        }
+
+        public bool IsDone => this.LastResult == SolverResult.Done;
+
+        private SolverResult LastResult => this.SolverResults.Any()
+            ? this.SolverResults.Last()
+            : SolverResult.Unknown;
+
         public bool FindSimple()
         {
             var foundSimple = false;
@@ -75,33 +94,6 @@
             return foundOne;
         }
 
-        private bool AddIfIntersect(SudokuCell cell, IEnumerable<int> possibleValues, int possibleValue)
-        {
-            if (possibleValues.Count(x => x == possibleValue) != 1)
-            {
-                return false;
-            }
-
-            this.AddValue(cell, possibleValue);
-            return true;
-        }
-
-        private void AddValue(SudokuCell cell, int value)
-        {
-            if (this.SolverResults.Any(x => x == SolverResult.Guessed))
-            {
-                cell.CalculatedAfterGuess = value;
-            }
-            else
-            {
-                cell.CalculatedValue = value;
-            }
-        }
-
-        private SolverResult LastResult => this.SolverResults.Any()
-            ? this.SolverResults.Last()
-            : SolverResult.Unknown;
-
         public Solver Next()
         {
             if (this.LastResult == SolverResult.Unknown || this.LastResult == SolverResult.FoundOne || !this.innerResults.Any())
@@ -143,21 +135,6 @@
             throw new Exception("message");
         }
 
-        public List<SolverResult> SolverResults
-        {
-            get
-            {
-                if (this.antecedent != null)
-                {
-                    return this.antecedent.SolverResults.Concat(this.innerResults).ToList();
-                }
-
-                return this.innerResults;
-            }
-        }
-
-        public bool IsDone => this.LastResult == SolverResult.Done;
-
         public void SolveStep()
         {
             if (this.FindSimple())
@@ -198,8 +175,29 @@
             }
 
             this.innerResults.Add(SolverResult.Guessed);
-            return;
         }
 
+        private bool AddIfIntersect(SudokuCell cell, IEnumerable<int> possibleValues, int possibleValue)
+        {
+            if (possibleValues.Count(x => x == possibleValue) != 1)
+            {
+                return false;
+            }
+
+            this.AddValue(cell, possibleValue);
+            return true;
+        }
+
+        private void AddValue(SudokuCell cell, int value)
+        {
+            if (this.SolverResults.Any(x => x == SolverResult.Guessed))
+            {
+                cell.CalculatedAfterGuess = value;
+            }
+            else
+            {
+                cell.CalculatedValue = value;
+            }
+        }
     }
 }

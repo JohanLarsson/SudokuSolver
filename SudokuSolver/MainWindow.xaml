@@ -6,8 +6,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:sudokuSolver="clr-namespace:SudokuSolver"
     Title="MainWindow"
-    Width="525"
-    Height="350"
     d:DataContext="{d:DesignInstance sudokuSolver:Vm,
                                      IsDesignTimeCreatable=True}"
     ResizeMode="NoResize"
