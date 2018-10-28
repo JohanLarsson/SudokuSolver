@@ -1,6 +1,5 @@
 ﻿namespace SudokuSolver
 {
-    using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
     using System.Runtime.CompilerServices;
@@ -11,7 +10,6 @@
     public class Vm : INotifyPropertyChanged
     {
         private bool notNewBoard;
-        private List<Solver> solvers = new List<Solver>();
         private string fileName;
         private SudokuBoard board;
         private Solver solver;
