@@ -23,6 +23,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>SudokuSolver.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,6 +33,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>SudokuSolver.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Ookii.Dialogs.Wpf">
@@ -60,9 +62,8 @@
     <Compile Include="RelayCommand.cs" />
     <Compile Include="FlattenConverter.cs" />
     <Compile Include="MatrixToDataViewConverter.cs" />
-    <Compile Include="MatrixView.cs" />
-    <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Solver.cs" />
+    <Compile Include="SolverResult.cs" />
     <Compile Include="SudokuBoard.cs" />
     <Compile Include="SudokuCell.cs" />
     <Compile Include="ToColumnsConverter.cs" />
@@ -105,9 +106,19 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
+    <None Include="SudokuSolver.ruleset" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Analyzer Include="..\packages\IDisposableAnalyzers.2.0.5.0\analyzers\dotnet\cs\IDisposableAnalyzers.dll" />
+    <Analyzer Include="..\packages\PropertyChangedAnalyzers.2.7.0.0\analyzers\dotnet\cs\Gu.Roslyn.Extensions.dll" />
+    <Analyzer Include="..\packages\PropertyChangedAnalyzers.2.7.0.0\analyzers\dotnet\cs\PropertyChangedAnalyzers.dll" />
+    <Analyzer Include="..\packages\ReflectionAnalyzers.0.1.15.0-dev\analyzers\dotnet\cs\ReflectionAnalyzers.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.0-beta009\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.0-beta009\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
+    <Analyzer Include="..\packages\WpfAnalyzers.2.2.0.2\analyzers\dotnet\cs\WpfAnalyzers.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

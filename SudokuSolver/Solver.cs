@@ -1,46 +1,53 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace SudokuSolver
+﻿namespace SudokuSolver
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class Solver
     {
-        private readonly Solver _antecedent;
+        private static int solverCount;
+
+        private readonly Solver antecedent;
+        private readonly List<SolverResult> innerResults = new List<SolverResult>();
+        private readonly List<Solver> guessSolvers = new List<Solver>();
+        private int guessIndex = 0;
 
         public Solver(SudokuBoard board)
         {
-            Board = board;
+            this.Board = board;
         }
 
         public Solver(Solver antecedent, SudokuBoard board)
         {
-            _antecedent = antecedent;
-            Board = board;
+            this.antecedent = antecedent;
+            this.Board = board;
         }
 
-        public SudokuBoard Board { get; private set; }
+        public SudokuBoard Board { get; }
+
         public bool FindSimple()
         {
-            bool foundSimple = false;
-            var simples = Board.AllCells.Where(c => c.PossibleValues.Count == 1).ToArray();
+            var foundSimple = false;
+            var simples = this.Board.AllCells.Where(c => c.PossibleValues.Count == 1).ToArray();
             foreach (var cell in simples)
             {
                 if (!cell.PossibleValues.Any())
+                {
                     return false;
-                AddValue(cell, cell.PossibleValues.Single());
+                }
+
+                this.AddValue(cell, cell.PossibleValues.Single());
                 foundSimple = true;
             }
+
             return foundSimple;
         }
 
         public bool FindIntersect()
         {
-            bool foundOne = false;
-            var cells = Board.AllCells.Where(c => !c.HasValue).ToArray();
+            var foundOne = false;
+            var cells = this.Board.AllCells.Where(c => !c.HasValue).ToArray();
             foreach (var cell in cells)
             {
                 var allRowValues = cell.Row.SelectMany(x => x.PossibleValues).ToArray();
@@ -48,34 +55,40 @@ namespace SudokuSolver
                 var allClusterValues = cell.Cluster.SelectMany(x => x.PossibleValues).ToArray();
                 foreach (var possibleValue in cell.PossibleValues)
                 {
-                    if (AddIfIntersect(cell, allRowValues, possibleValue))
+                    if (this.AddIfIntersect(cell, allRowValues, possibleValue))
                     {
                         foundOne = true;
                     }
-                    if (AddIfIntersect(cell, allColumnValues, possibleValue))
+
+                    if (this.AddIfIntersect(cell, allColumnValues, possibleValue))
                     {
                         foundOne = true;
                     }
-                    if (AddIfIntersect(cell, allClusterValues, possibleValue))
+
+                    if (this.AddIfIntersect(cell, allClusterValues, possibleValue))
                     {
                         foundOne = true;
                     }
                 }
             }
+
             return foundOne;
         }
 
         private bool AddIfIntersect(SudokuCell cell, IEnumerable<int> possibleValues, int possibleValue)
         {
             if (possibleValues.Count(x => x == possibleValue) != 1)
+            {
                 return false;
-            AddValue(cell, possibleValue);
+            }
+
+            this.AddValue(cell, possibleValue);
             return true;
         }
 
         private void AddValue(SudokuCell cell, int value)
         {
-            if (SolverResults.Any(x => x == SolverResult.Guessed))
+            if (this.SolverResults.Any(x => x == SolverResult.Guessed))
             {
                 cell.CalculatedAfterGuess = value;
             }
@@ -85,132 +98,108 @@ namespace SudokuSolver
             }
         }
 
-        public Solver Solve()
-        {
-            while (true)
-            {
-                //Solver first;
-                //if (Next(out first)) return first;
-            }
-        }
-
-        private SolverResult LastResult
-        {
-            get
-            {
-                return SolverResults.Any()
-                    ? SolverResults.Last()
-                    : SolverResult.Unknown;
-            }
-        }
+        private SolverResult LastResult => this.SolverResults.Any()
+            ? this.SolverResults.Last()
+            : SolverResult.Unknown;
 
         public Solver Next()
         {
-            if (LastResult == SolverResult.Unknown || LastResult == SolverResult.FoundOne || !_innerResults.Any())
+            if (this.LastResult == SolverResult.Unknown || this.LastResult == SolverResult.FoundOne || !this.innerResults.Any())
             {
-                SolveStep();
-                if (LastResult == SolverResult.Guessed)
+                this.SolveStep();
+                if (this.LastResult == SolverResult.Guessed)
                 {
-                    var guessSolver = _guessSolvers[_guessIndex];
-                    _guessIndex++;
+                    var guessSolver = this.guessSolvers[this.guessIndex];
+                    this.guessIndex++;
                     return guessSolver;
                 }
+
                 return this;
             }
 
-            if (LastResult == SolverResult.Done)
+            if (this.LastResult == SolverResult.Done)
             {
                 return this;
             }
-            if (LastResult == SolverResult.Error)
-            {
-                return _antecedent;
-            }
-            if (LastResult == SolverResult.Guessed)
-            {
 
-                if (_guessIndex >= _guessSolvers.Count)
-                    return _antecedent;
-                var guessSolver = _guessSolvers[_guessIndex];
-                _guessIndex++;
+            if (this.LastResult == SolverResult.Error)
+            {
+                return this.antecedent;
+            }
+
+            if (this.LastResult == SolverResult.Guessed)
+            {
+                if (this.guessIndex >= this.guessSolvers.Count)
+                {
+                    return this.antecedent;
+                }
+
+                var guessSolver = this.guessSolvers[this.guessIndex];
+                this.guessIndex++;
                 guessSolver.SolveStep();
                 return guessSolver;
             }
-            throw new Exception(string.Format(@"message"));
 
+            throw new Exception("message");
         }
 
-        private int _guessIndex = 0;
-
-        private static int _solverCount;
-
-        private readonly List<SolverResult> _innerResults = new List<SolverResult>();
         public List<SolverResult> SolverResults
         {
             get
             {
-                if (_antecedent != null)
-                    return _antecedent.SolverResults.Concat(_innerResults).ToList();
-                return _innerResults;
+                if (this.antecedent != null)
+                {
+                    return this.antecedent.SolverResults.Concat(this.innerResults).ToList();
+                }
+
+                return this.innerResults;
             }
         }
 
-        public bool IsDone
-        {
-            get
-            {
-                return LastResult == SolverResult.Done;
-            }
-        }
+        public bool IsDone => this.LastResult == SolverResult.Done;
 
         public void SolveStep()
         {
-            if (FindSimple())
+            if (this.FindSimple())
             {
-                _innerResults.Add(SolverResult.FoundOne);
-                return;
-            }
-            if (FindIntersect())
-            {
-                _innerResults.Add(SolverResult.FoundOne);
+                this.innerResults.Add(SolverResult.FoundOne);
                 return;
             }
 
-            if (Board.AllCells.Any(c => !c.HasValue && !c.PossibleValues.Any()))
+            if (this.FindIntersect())
             {
-                _innerResults.Add(SolverResult.Error);
+                this.innerResults.Add(SolverResult.FoundOne);
                 return;
             }
-            var remainingCells = Board.AllCells.Where(c => !c.HasValue).ToArray();
+
+            if (this.Board.AllCells.Any(c => !c.HasValue && !c.PossibleValues.Any()))
+            {
+                this.innerResults.Add(SolverResult.Error);
+                return;
+            }
+
+            var remainingCells = this.Board.AllCells.Where(c => !c.HasValue).ToArray();
             if (!remainingCells.Any())
             {
-                _innerResults.Add(SolverResult.Done);
+                this.innerResults.Add(SolverResult.Done);
                 return;
             }
-            int min = remainingCells.Min(x => x.PossibleValues.Count);
-            SudokuCell guessCell = remainingCells.First(x => x.PossibleValues.Count == min);
-            for (int index = 0; index < guessCell.PossibleValues.Count; index++)
+
+            var min = remainingCells.Min(x => x.PossibleValues.Count);
+            var guessCell = remainingCells.First(x => x.PossibleValues.Count == min);
+            for (var index = 0; index < guessCell.PossibleValues.Count; index++)
             {
-                SudokuBoard sudokuBoard = Board.Clone();
+                var sudokuBoard = this.Board.Clone();
                 sudokuBoard.Cells[guessCell.RowIndex, guessCell.ColumnIndex].GuessValue =
                     guessCell.PossibleValues[index];
                 var solver = new Solver(this, sudokuBoard);
-                _guessSolvers.Add(solver);
-                _solverCount++;
+                this.guessSolvers.Add(solver);
+                solverCount++;
             }
-            _innerResults.Add(SolverResult.Guessed);
+
+            this.innerResults.Add(SolverResult.Guessed);
             return;
         }
 
-        private readonly List<Solver> _guessSolvers = new List<Solver>();
-    }
-
-    public enum SolverResult
-    {
-        Done,
-        Error,
-        FoundOne,
-        Guessed,
-        Unknown
     }
 }

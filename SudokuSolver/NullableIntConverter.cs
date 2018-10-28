@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
-
-namespace SudokuSolver
+﻿namespace SudokuSolver
 {
-    public class NullableIntConverter :IValueConverter
+    using System;
+    using System.Globalization;
+    using System.Windows.Data;
+
+    public class NullableIntConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -17,10 +13,12 @@ namespace SudokuSolver
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            string s =(string) value;
-            int i;
-            if (int.TryParse(s, out i))
+            var s = (string)value;
+            if (int.TryParse(s, out var i))
+            {
                 return i;
+            }
+
             return null;
         }
     }

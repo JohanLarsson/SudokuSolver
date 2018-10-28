@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using Ookii.Dialogs.Wpf;
-
-namespace SudokuSolver
+﻿namespace SudokuSolver
 {
+    using System;
+    using System.Collections.Generic;
+
     [Serializable]
     public class SudokuBoard
     {
         public SudokuBoard()
         {
-            Cells = new SudokuCell[9, 9];
-            for (int i = 0; i < 9; i++)
+            this.Cells = new SudokuCell[9, 9];
+            for (var i = 0; i < 9; i++)
             {
-                for (int j = 0; j < 9; j++)
+                for (var j = 0; j < 9; j++)
                 {
-                    Cells[i, j] = new SudokuCell(this, i, j);
+                    this.Cells[i, j] = new SudokuCell(this, i, j);
                 }
             }
         }
@@ -31,7 +24,7 @@ namespace SudokuSolver
         {
             get
             {
-                foreach (var sudokuCell in Cells)
+                foreach (var sudokuCell in this.Cells)
                 {
                     yield return sudokuCell;
                 }
@@ -41,17 +34,17 @@ namespace SudokuSolver
         public SudokuBoard Clone()
         {
             var board = new SudokuBoard();
-            foreach (var cell in AllCells)
+            foreach (var cell in this.AllCells)
             {
-                board.Cells[cell.RowIndex, cell.ColumnIndex] = new SudokuCell(board, cell.RowIndex,
-                    cell.ColumnIndex)
+                board.Cells[cell.RowIndex, cell.ColumnIndex] = new SudokuCell(board, cell.RowIndex, cell.ColumnIndex)
                 {
                     Number = cell.Number,
                     CalculatedValue = cell.CalculatedValue,
                     GuessValue = cell.GuessValue,
-                    CalculatedAfterGuess = cell.CalculatedAfterGuess
+                    CalculatedAfterGuess = cell.CalculatedAfterGuess,
                 };
             }
+
             return board;
         }
     }

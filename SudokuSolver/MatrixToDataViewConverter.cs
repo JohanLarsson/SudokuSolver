@@ -1,15 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Data;
-using System.Windows.Media;
-
-namespace SudokuSolver
+﻿namespace SudokuSolver
 {
+    using System;
+    using System.Data;
+    using System.Globalization;
+    using System.Windows.Data;
+
     /// <summary>
     /// http://stackoverflow.com/questions/16812020/how-to-bind-an-2d-array-bool-to-a-wpf-datagrid-one-way
     /// </summary>
@@ -18,7 +13,10 @@ namespace SudokuSolver
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var array = value as SudokuCell[,];
-            if (array == null) return null;
+            if (array == null)
+            {
+                return null;
+            }
 
             var rows = array.GetLength(0);
             var columns = array.GetLength(1);
@@ -40,7 +38,6 @@ namespace SudokuSolver
 
                 t.Rows.Add(newRow);
             }
-
 
             return t.DefaultView;
         }

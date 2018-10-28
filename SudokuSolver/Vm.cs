@@ -1,135 +1,135 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.Remoting.Messaging;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
-using Ookii.Dialogs.Wpf;
-using SudokuSolver.Annotations;
-
-namespace SudokuSolver
+﻿namespace SudokuSolver
 {
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.IO;
+    using System.Runtime.CompilerServices;
+    using System.Runtime.Serialization.Formatters.Binary;
+    using System.Windows.Input;
+    using Ookii.Dialogs.Wpf;
+
     public class Vm : INotifyPropertyChanged
     {
+        private bool notNewBoard;
+        private List<Solver> solvers = new List<Solver>();
+        private string fileName;
+        private SudokuBoard board;
+        private Solver solver;
+
         public Vm()
         {
-            Board = new SudokuBoard();
+            this.Board = new SudokuBoard();
             this.PropertyChanged += (sender, args) =>
             {
-                if (args.PropertyName =="Board")
+                if (args.PropertyName == "Board")
                 {
-                    if(_notNewBoard)
+                    if (this.notNewBoard)
+                    {
                         return;
-                    _solver = new Solver(Board);
+                    }
+
+                    this.solver = new Solver(this.Board);
                 }
             };
-            _solver = new Solver(Board);
-            SaveCommand = new RelayCommand(o => Save());
-            SaveAsCommand = new RelayCommand(o=> SaveAs());
-            OpenCommand = new RelayCommand(o => Open());
-            NewCommand = new RelayCommand(o => New());
-            NextCommand = new RelayCommand(o=>Next(),o=>!_solver.IsDone);
+            this.solver = new Solver(this.Board);
+            this.SaveCommand = new RelayCommand(o => this.Save());
+            this.SaveAsCommand = new RelayCommand(o => this.SaveAs());
+            this.OpenCommand = new RelayCommand(o => this.Open());
+            this.NewCommand = new RelayCommand(o => this.New());
+            this.NextCommand = new RelayCommand(o => this.Next(), o => !this.solver.IsDone);
         }
 
-        private bool _notNewBoard;
-        private void Next()
-        {
-            _solver = _solver.Next();
-            _notNewBoard = true;
-            Board= _solver.Board;
-            _notNewBoard = false;
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
-        private List<Solver> _solvers= new List<Solver>(); 
+        public ICommand SaveCommand { get; }
 
-        private void New()
-        {
-            _fileName = null;
-            Board= new SudokuBoard();
-        }
-
-        private void SaveAs()
-        {
-            _fileName = null;
-            Save();
-        }
+        public ICommand SaveAsCommand { get; }
 
         public SudokuBoard Board
         {
-            get { return _board; }
+            get => this.board;
             set
             {
-                if (Equals(value, _board)) return;
-                _board = value;
-                OnPropertyChanged();
+                if (Equals(value, this.board))
+                {
+                    return;
+                }
+
+                this.board = value;
+                this.OnPropertyChanged();
             }
         }
 
-        private string _fileName;
-        private readonly string _filter = "Sudoku files|*.sud";
-        private SudokuBoard _board;
-        private Solver _solver;
+        public ICommand OpenCommand { get; }
 
-        public ICommand SaveCommand { get; private set; }
-        public ICommand SaveAsCommand { get; private set; }
+        public ICommand NewCommand { get; }
+
+        public ICommand NextCommand { get; }
+
+        private void Open()
+        {
+            var dialog = new VistaOpenFileDialog { Filter = "Sudoku files|*.sud" };
+            if (dialog.ShowDialog() == true)
+            {
+                this.fileName = dialog.FileName;
+                var bf = new BinaryFormatter();
+                using (var fileStream = File.OpenRead(this.fileName))
+                {
+                    var sudokuBoard = (SudokuBoard)bf.Deserialize(fileStream);
+                    this.Board = sudokuBoard;
+                }
+            }
+        }
+
         private void Save()
         {
-            if (_fileName == null)
+            if (this.fileName == null)
             {
-                var dialog = new VistaSaveFileDialog { Filter = _filter };
+                var dialog = new VistaSaveFileDialog { Filter = "Sudoku files|*.sud" };
                 if (dialog.ShowDialog() == true)
                 {
-                    _fileName = dialog.FileName;
+                    this.fileName = dialog.FileName;
                 }
                 else
                 {
                     return;
                 }
-
             }
-            using (FileStream fileStream = File.OpenWrite(_fileName))
+
+            using (var fileStream = File.OpenWrite(this.fileName))
             {
                 var bf = new BinaryFormatter();
-                bf.Serialize(fileStream, Board);
+                bf.Serialize(fileStream, this.Board);
             }
         }
 
-        public ICommand OpenCommand { get; private set; }
-        private void Open()
+        private void Next()
         {
-            var dialog = new VistaOpenFileDialog { Filter = _filter };
-            if (dialog.ShowDialog() == true)
-            {
-                _fileName = dialog.FileName;
-                var bf = new BinaryFormatter();
-                using (var fileStream = File.OpenRead(_fileName))
-                {
-                    var sudokuBoard = (SudokuBoard)bf.Deserialize(fileStream);
-                    Board = sudokuBoard;
-                }
-            }
+            this.solver = this.solver.Next();
+            this.notNewBoard = true;
+            this.Board = this.solver.Board;
+            this.notNewBoard = false;
         }
 
-        public ICommand NewCommand { get; private set; }
+        private void New()
+        {
+            this.fileName = null;
+            this.Board = new SudokuBoard();
+        }
 
-        public ICommand NextCommand { get; private set; }
+        private void SaveAs()
+        {
+            this.fileName = null;
+            this.Save();
+        }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null) handler(this, new PropertyChangedEventArgs(propertyName));
-
+            var handler = this.PropertyChanged;
+            if (handler != null)
+            {
+                handler(this, new PropertyChangedEventArgs(propertyName));
+            }
         }
-
     }
 }
-
